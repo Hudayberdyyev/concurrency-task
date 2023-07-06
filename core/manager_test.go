@@ -18,7 +18,7 @@ func TestRun(t *testing.T) {
 	assert.NoError(t, err)
 
 	elapsedTime := time.Since(startTime).Seconds()
-	maxRequiredTime := float64((len(tasks)+1)*RegisterDurationSec) / float64(numCpu)
+	maxRequiredTime := float64(len(tasks)*RegisterDurationSec)/float64(numCpu) + 1
 	assert.LessOrEqual(t, elapsedTime, maxRequiredTime)
 
 	progressCount := 0
