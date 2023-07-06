@@ -6,17 +6,19 @@ import (
 )
 
 func main() {
-	tasks := make([]core.Task, 5)
+	tasks := make([]core.Task, 2)
 	manager := core.NewManager(tasks)
 
-	go func() {
-		err := manager.Run()
-		if err != nil {
-			log.Printf("error when doing tasks: %v\n", err)
-		}
-	}()
-
-	for progress := range manager.Progress() {
-		log.Printf("progress = %d\n", progress)
+	err := manager.Run()
+	if err != nil {
+		log.Printf("error when doing tasks: %v\n", err)
 	}
+
+	progressChan := manager.Progress()
+	completed := 0
+	for len(progressChan) > 0 {
+		<-progressChan
+		completed++
+	}
+	log.Printf("%d tasks done\n", completed)
 }
