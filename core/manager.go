@@ -13,7 +13,7 @@ func NewManager(tasks []Task) *Manager {
 	return &Manager{
 		tasks:    tasks,
 		runner:   Runner{},
-		progress: make(chan uint8),
+		progress: make(chan uint8, len(tasks)),
 	}
 }
 
@@ -23,10 +23,10 @@ func (m *Manager) Run() error {
 		taskId, err := m.runner.Register(task)
 		m.completed++
 		wg.Add(1)
-		go func() {
+		go func(completed uint8) {
 			defer wg.Done()
-			m.progress <- m.completed
-		}()
+			m.progress <- completed
+		}(m.completed)
 		if err != nil {
 			return err
 		}
@@ -34,8 +34,6 @@ func (m *Manager) Run() error {
 	}
 
 	wg.Wait()
-	close(m.progress)
-
 	return nil
 }
 
